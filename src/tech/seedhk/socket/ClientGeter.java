@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import tech.seedhk.bean.ByteBuffer;
+import tech.seedhk.bean.ProxyObject;
 
 /**
  * 这是接收端，负责发送命令并接收数据
@@ -19,13 +20,17 @@ import tech.seedhk.bean.ByteBuffer;
  */
 public class ClientGeter {
 	
+	private static boolean first=true;
+	
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
+		
 		
 		Socket s=null;
 		while(true){
 			try {
-				s=new Socket("39.108.208.62", 6666);
+				//s=new Socket("39.108.208.62", 6666);
+				s=new Socket("127.0.0.1", 6666);
 				System.out.println("geter端连接服务器成功");
 				InputStream is=new DataInputStream(s.getInputStream());
 				byte[] data=ByteBuffer.read(is);
@@ -34,12 +39,18 @@ public class ClientGeter {
 				//准备发送命令
 				BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
 				OutputStream os=new DataOutputStream(s.getOutputStream());
-				System.out.println("请输入欲执行的命令");
-				String resp=reader.readLine();
-				System.out.println("发送数据："+resp);
 				ByteBuffer buffer= new ByteBuffer();
-				buffer.write(os, resp);
-				//os.write(resp.getBytes());
+				if(first){
+					buffer.write(os, "geter");
+					first=false;
+				}else{
+					System.out.println("请输入欲执行的命令");
+					ProxyObject po=ProxyObject.newInstance();
+					String resp=reader.readLine();
+					po.getMethod("tech.seedhk.utils.FileUtils", "showDire", new Object[]{resp}, String.class);
+					System.out.println("发送数据："+resp);
+					buffer.write(os, po);	
+				}
 				os.flush();
 				System.out.println("发送完毕");
 			} catch (Exception e){

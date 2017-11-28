@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import tech.seedhk.bean.ByteBuffer;
+import tech.seedhk.bean.ProxyObject;
 import tech.seedhk.utils.FileUtils;
 
 /**
@@ -34,8 +35,16 @@ public class ClientSender {
 				System.out.println("发送客户端连接服务器成功");
 				InputStream is=new DataInputStream(s.getInputStream());
 				byte[] read = ByteBuffer.read(is);
-				String ret=new String(read,"utf-8");
-				byte[] data=operate(ret);
+				Object object=null;
+				byte[] data=null;
+				if(!firstCon){
+					ProxyObject po=(ProxyObject) ProxyObject.byte2Bean(read);
+					object=ProxyObject.invoke(po.getClassName(), po.getMethodName(), po.getObjects(), String.class);
+				}else{
+					//String ret=new String(read,"utf-8");
+					// data=operate(ret);
+					data=ProxyObject.bean2byte(object);
+				}
 				OutputStream os=new DataOutputStream(s.getOutputStream());
 				ByteBuffer buffer=new ByteBuffer();
 				if(firstCon){

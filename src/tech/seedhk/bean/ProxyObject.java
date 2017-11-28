@@ -19,21 +19,36 @@ import org.junit.Test;
 
 public class ProxyObject implements Serializable{
 	
+	private static ProxyObject object;
+	
 		
 	private static final long serialVersionUID = 1L;
-	private  Class<?> className;	//类名
+	public  Class<?> className;	//类名
 	//private  Class<?> returnType;	//返回类型
-	private  String methodName;	//方法名
-	private  Class<?>[] classs;		//参数列表
-	private Object[] objects;		//参数值
+	public  String methodName;	//方法名
+	public  Class<?>[] classs;		//参数列表
+	public Object[] objects;		//参数值
 	
-	
-	public static ProxyObject newInstance(Class<?> className){
-		return null;
+	private ProxyObject(){
+		
 	}
 	
 	
-	public static  Object invoke(String classname,String methodname,Object[] objects,Class<?>... clazz){
+	public static ProxyObject newInstance(){
+		if(null==object)
+			object=new ProxyObject();
+		return object;
+	}
+	
+	/**
+	 *sender端调用该方法执行某个方法
+	 * @param classname
+	 * @param methodname
+	 * @param objects
+	 * @param clazz
+	 * @return
+	 */
+	public static Object invoke(Class<?> classname,String methodname,Object[] objects,Class<?>... clazz){
 		/*
 		 * 思路：
 		 * 暂不支持数组作为参数
@@ -45,7 +60,7 @@ public class ProxyObject implements Serializable{
 		Object ret = null;
 		Class<?>[] paramTypes;
 		try {
-			c=Class.forName(classname);
+			c=classname;
 			m=c.getMethod(methodname, clazz);
 			paramTypes=m.getParameterTypes();
 /*			for(Class<?> s:paramTypes){
@@ -66,14 +81,18 @@ public class ProxyObject implements Serializable{
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+		} 
 		
 		return ret;
 	}
 	
-	
+	/**
+	 * geter端调用该方法传递某个方法
+	 * @param classname
+	 * @param methodname
+	 * @param objects
+	 * @param clazz
+	 */
 	public void getMethod(String classname,String methodname,Object[] objects,Class<?>... clazz) {
 
 		Class<?> c;
@@ -87,7 +106,7 @@ public class ProxyObject implements Serializable{
 			//returnType=retType;
 			methodName=method.getName();
 			classs=clazz;
-			objects=objects;
+			this.objects=objects;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (NoSuchMethodException e) {
@@ -174,6 +193,49 @@ public class ProxyObject implements Serializable{
 		}
 		return list;
 	}
+
+
+	public Class<?> getClassName() {
+		return className;
+	}
+
+
+	public void setClassName(Class<?> className) {
+		this.className = className;
+	}
+
+
+	public String getMethodName() {
+		return methodName;
+	}
+
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+
+	public Class<?>[] getClasss() {
+		return classs;
+	}
+
+
+	public void setClasss(Class<?>[] classs) {
+		this.classs = classs;
+	}
+
+
+	public Object[] getObjects() {
+		return objects;
+	}
+
+
+	public void setObjects(Object[] objects) {
+		this.objects = objects;
+	}
+	
+	
+	
 	
 	
 	

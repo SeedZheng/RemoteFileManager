@@ -80,10 +80,12 @@ public class Server3 implements Runnable{
 			try {
 				os=new DataOutputStream(s.getOutputStream());
 				ByteBuffer buffer=new ByteBuffer();
+				//if(data!=null && sendData==null)
+				
 				if(sendData==null)
 					buffer.write(os, "no data");
 				else
-					buffer.write(os, sendData);
+					buffer.writeObj(os, sendData);
 				//os.write(sendData);
 				os.flush();
 				sendData=null;//接收完命令后清空该缓冲区
@@ -130,7 +132,7 @@ public class Server3 implements Runnable{
 					Thread.sleep(3000);
 				}
 				ByteBuffer buffer=new ByteBuffer();
-				buffer.write(os, data);
+				buffer.writeObj(os, data);
 				//os.write(data);
 				os.flush();
 				data=null;//接收完命令后清空该缓冲区
@@ -191,7 +193,10 @@ public class Server3 implements Runnable{
 					os.flush();
 					//os.close();//自带flush，且关闭当前socket
 					is=new DataInputStream(s.getInputStream());
-					//ByteBuffer buffer1=new ByteBuffer();
+					/*
+					 *如果有多个客户端对应一个server端，且多个客户端同事发送数据，数据是否会冲突？
+					 *不会，因为不同的server线程对应不同的客户端，每个线程有自己独立的socket通道，且read方法不会相互阻塞
+					 */
 					byte[] da=ByteBuffer.read(is);
 					//int i=0;
 					//StringBuilder sb=new StringBuilder();

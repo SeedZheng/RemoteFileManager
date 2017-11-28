@@ -84,6 +84,22 @@ public class ByteBuffer implements Serializable{
 		//return buffer;
 	}
 	
+	public  void write(OutputStream os,Object obj) throws IOException{
+	
+		byte[] b=ProxyObject.bean2byte(obj);
+		
+		int length=b.length;
+		setDataLength(length);
+		
+		for(int i=0;i<length;i++){
+			if(length>=buffer.length-10)
+				reSizeByte(buffer.length+10);
+			buffer[10+i]=b[i];
+		}
+		os.write(buffer);
+		//return buffer;
+	}
+	
 	public  void write(OutputStream os,byte[] data) throws IOException{
 		
 		int length=getbyteRealLength(data);
@@ -98,6 +114,23 @@ public class ByteBuffer implements Serializable{
 		os.write(buffer);
 		//return buffer;
 	}
+	
+	public  void writeObj(OutputStream os,byte[] data) throws IOException{
+		
+		int length=data.length;
+		setDataLength(length);
+		byte[] b=data;
+		
+		for(int i=0;i<length;i++){
+			if(length>=buffer.length-10)
+				reSizeByte(buffer.length+10);
+			buffer[10+i]=b[i];
+		}
+		os.write(buffer);
+		//return buffer;
+	}
+	
+	
 	
 	public int getcharLength(){
 		return chars.length;
