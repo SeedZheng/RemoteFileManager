@@ -6,16 +6,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
 
 public class ProxyObject implements Serializable{
 	
@@ -130,6 +128,22 @@ public class ProxyObject implements Serializable{
 		return b;
 	}
 	
+	public static ByteBuffer bean2Buffer(Object obj){
+		
+		byte[] b=null;
+		
+		try {
+			ByteArrayOutputStream baos=new ByteArrayOutputStream();
+			ObjectOutputStream oos=new ObjectOutputStream(baos);
+			oos.writeObject(obj);
+			b = baos.toByteArray();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		ByteBuffer buffer=ByteBuffer.wrap(b);
+		return buffer;
+	}
+	
 	public static Object byte2Bean(byte[] b){
 		Object o=null;
 		try {
@@ -143,6 +157,27 @@ public class ProxyObject implements Serializable{
 		}
 		
 		return o;
+	}
+	
+	public static Object buffer2Bean(ByteBuffer buffer){
+		
+		Object o=null;
+		
+		if(buffer.hasArray()){
+			byte[] buf=buffer.array();
+			try {
+				ByteArrayInputStream bais=new ByteArrayInputStream(buf);
+				ObjectInputStream ios=new ObjectInputStream(bais);
+				o=ios.readObject();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return o;
+		
 	}
 		
 

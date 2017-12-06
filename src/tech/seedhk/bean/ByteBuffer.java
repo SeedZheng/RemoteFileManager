@@ -74,6 +74,7 @@ public class ByteBuffer implements Serializable{
 		int length=data.length();
 		setDataLength(length);
 		byte[] b=data.getBytes();
+	
 		
 		for(int i=0;i<length;i++){
 			if(length>=buffer.length-10)
@@ -81,6 +82,7 @@ public class ByteBuffer implements Serializable{
 			buffer[10+i]=b[i];
 		}
 		os.write(buffer);
+		os.flush();
 		//return buffer;
 	}
 	
@@ -141,6 +143,7 @@ public class ByteBuffer implements Serializable{
 	}
 	
 	public static void setDataLength(int data){
+		buffer=new byte[11];
 		if(buffer!=null){
 			byte[] temp=(data+"").getBytes();
 			int length=temp.length;  //3
