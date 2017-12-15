@@ -28,7 +28,7 @@ public class FileUtils {
 			if(!isEmpty(files)){
 				fileNames=new String[files.length];
 				for(int i=0;i<files.length;i++){
-					fileNames[i]=files[i].getName();
+					fileNames[i]=files[i].getName()+"\n";
 				}
 			}
 		}
@@ -90,8 +90,11 @@ public class FileUtils {
 	}
 	
 	public static void main(String[] args) {
-		String str="showD:/";
-		System.out.println(str.substring(4));
+		//测试汉子“向”的acsii编码
+		String str="向";
+		byte[] b=new byte[str.length()];
+		b=str.getBytes();
+		System.out.println(b);
 	}
 
 }

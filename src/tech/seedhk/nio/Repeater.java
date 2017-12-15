@@ -21,7 +21,7 @@ public class Repeater {
 	
 	public static void main(String[] args) throws Exception {
 		Repeater r=new Repeater();
-		r.initServer(6666);
+		r.initServer(8888);
 	}
 	
 	@SuppressWarnings("resource")
@@ -35,11 +35,13 @@ public class Repeater {
 			if(map.get("server")!=null){
 				if(ip.equals(map.get("server"))){
 					threadPool.execute(new Sender(s));
+					break;
 				}
 			}
 			if(map.get("client")!=null){
 				if(ip.equals(map.get("client"))){
 					threadPool.execute(new Geter(s));
+					break;
 				}
 			}
 			threadPool.execute(new Register(s));
@@ -73,7 +75,7 @@ public class Repeater {
 				if("client".equals(type))
 					map.put("client", ip);
 				if("server".equals(type))
-					map.put("server", type);
+					map.put("server", ip);
 				
 				ByteBuffer buffer=new ByteBuffer();
 				buffer.write(os, "success");

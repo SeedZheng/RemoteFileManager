@@ -40,7 +40,7 @@ public class NioServerBoss implements Runnable{
 	}
 
 	private void initBoss() {
-		Thread.currentThread().setName(threadName);
+		Thread.currentThread().setName(threadName+" "+Thread.currentThread().getId());
 		try {
 			this.selector=Selector.open();
 		} catch (IOException e) {
@@ -61,6 +61,7 @@ public class NioServerBoss implements Runnable{
 			e.printStackTrace();
 		}
 		boss.execute(this);
+		System.out.println(Thread.currentThread().getName()+"启动成功");
 		
 	}
 
@@ -100,9 +101,11 @@ public class NioServerBoss implements Runnable{
 		
 		
 		public Worker(SocketChannel c) throws Exception{
+			Thread.currentThread().setName("worker "+Thread.currentThread().getId());
 			this.selector = Selector.open();	//重新打开一个selector，让worker线程和boss线程各司其职
 			this.channel=c;
 			channel.register(selector, SelectionKey.OP_READ);
+			System.out.println(Thread.currentThread().getName()+"启动成功，等待client端连接");
 		}
 
 		@Override
@@ -113,7 +116,10 @@ public class NioServerBoss implements Runnable{
 				while(!isStop){
 					int n=this.selector.select();
 					if(n<1)
-						continue;
+						continue;//退出此次循环
+					
+					System.out.println(Thread.currentThread().getName()+"接收到一个client端请求");
+					
 					Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 					
 					while(iterator.hasNext()){
@@ -126,7 +132,7 @@ public class NioServerBoss implements Runnable{
 						// 数据总长度
 						long ret = 0;
 						boolean failure = true;
-						ByteBuffer head=ByteBuffer.allocate(5);
+						ByteBuffer head=ByteBuffer.allocate(10);
 			        	ByteBuffer body=ByteBuffer.allocate(1024);
 			        	ByteBuffer[] buffers=new ByteBuffer[]{head,body};
 						//读取数据
@@ -224,6 +230,5 @@ public class NioServerBoss implements Runnable{
 		fc.close();
 		
 		return ret;
-		
 	}
 }

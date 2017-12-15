@@ -30,6 +30,11 @@ public class Client {
 	private  Selector selector;
 	private boolean isGet=false;
 	
+	public static void main(String[] args) throws Exception {
+		Client client=new Client();
+		client.register("127.0.0.1", 8888);
+	}
+	
 	public void register(String host,int port) throws Exception{
 
 		Socket s;
@@ -45,8 +50,8 @@ public class Client {
 			byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
 			String ret=new String(data,"utf-8");
 			System.out.println(ret);
-			if("get ip".contains(ret)){
-				String ip=ret.substring(ret.indexOf(":"));
+			if(ret.contains("get ip")){
+				String ip=ret.substring(ret.indexOf(":")+1);
 				System.out.println("已获取到IP地址，地址是: "+ip);
 				is.close();
 				os.close();
@@ -112,7 +117,6 @@ public class Client {
 	private void read(SelectionKey key) throws Exception {
 		SocketChannel sChannel=(SocketChannel) key.channel();
 		
-		//ByteBuffer buffer=ByteBuffer.allocate(1024);
 		ByteBuffer[] buffers=new ByteBuffer[2];
 		
 		sChannel.read(buffers);
@@ -127,21 +131,22 @@ public class Client {
 		sChannel.write(buffer);
 		scan.close();
 		
-		//String msg=new String(buffer.array());
-		//System.out.println("当前线程为："+Thread.currentThread().getName()+"从服务器收到的消息："+msg.trim());
-		//BufferedReader reader=new BufferedReader(new InputStreamReader(System.in));
-		//System.out.println("请输入命令");
-		//String r = reader.readLine();
-		
-		//ByteBuffer out=ByteBuffer.wrap(r.getBytes());
-		//sChannel.write(out);
 		
 	}
 	
 	private ByteBuffer[] writeData(String h,String b){
 		
-		ByteBuffer head = ByteBuffer.wrap(h.getBytes());
-		ByteBuffer body = ByteBuffer.wrap(b.getBytes());
+		byte[] by=new byte[10];
+		byte[] data=h.trim().getBytes();
+		for(int i=0;i<by.length;i++){
+			if(i<data.length)
+					by[i]=data[i];
+			else
+				by[i]='\0';
+		}
+		
+		ByteBuffer head = ByteBuffer.wrap(by);
+		ByteBuffer body = ByteBuffer.wrap(b.trim().getBytes());
 		
 		return new ByteBuffer[]{head,body};
 	}
