@@ -21,7 +21,7 @@ public class NioServerBoss implements Runnable{
 	
 	
 	public static void main(String[] args) {
-		new NioServerBoss(Executors.newCachedThreadPool(),"boss",selector,8888);
+		//new NioServerBoss(Executors.newCachedThreadPool(),"boss",selector,8888);
 	}
 	
 	private Executor boss;

@@ -117,9 +117,10 @@ public class Client {
 	private void read(SelectionKey key) throws Exception {
 		SocketChannel sChannel=(SocketChannel) key.channel();
 		
-		ByteBuffer[] buffers=new ByteBuffer[2];
+		ByteBuffer[] buffers=new ByteBuffer[]{ByteBuffer.allocate(10),ByteBuffer.allocate(1024)};
 		
 		sChannel.read(buffers);
+		getData(buffers);
 		
 		Scanner scan=new Scanner(System.in);
 		

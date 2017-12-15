@@ -23,6 +23,12 @@ public class Repeater {
 		Repeater r=new Repeater();
 		r.initServer(8888);
 	}
+	/*
+	 *break的作用是跳出当前循环块（for、while、do while）或程序块（switch）。在循环块中的作用是跳出当前正在循环的循环体。
+	 *在程序块中的作用是中断和下一个case条件的比较。
+	 *continue用于结束循环体中其后语句的执行，并跳回循环程序块的开头执行下一次循环，而不是立刻循环体。
+	 * 
+	 */
 	
 	@SuppressWarnings("resource")
 	private void initServer(int port)throws Exception{
@@ -35,13 +41,13 @@ public class Repeater {
 			if(map.get("server")!=null){
 				if(ip.equals(map.get("server"))){
 					threadPool.execute(new Sender(s));
-					break;
+					continue;
 				}
 			}
 			if(map.get("client")!=null){
 				if(ip.equals(map.get("client"))){
 					threadPool.execute(new Geter(s));
-					break;
+					continue;
 				}
 			}
 			threadPool.execute(new Register(s));
