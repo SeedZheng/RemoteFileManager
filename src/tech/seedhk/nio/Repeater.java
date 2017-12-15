@@ -32,13 +32,13 @@ public class Repeater {
 			Socket s = ss.accept();
 			String ip=s.getInetAddress().getHostAddress();
 			System.out.println("ip："+ip);
-			if(map.get("sender")!=null){
-				if(ip.equals(map.get("sender"))){
+			if(map.get("server")!=null){
+				if(ip.equals(map.get("server"))){
 					threadPool.execute(new Sender(s));
 				}
 			}
-			if(map.get("geter")!=null){
-				if(ip.equals(map.get("geter"))){
+			if(map.get("client")!=null){
+				if(ip.equals(map.get("client"))){
 					threadPool.execute(new Geter(s));
 				}
 			}
@@ -70,10 +70,10 @@ public class Repeater {
 				byte[] data=ByteBuffer.read(is);
 				String ip=socket.getInetAddress().getHostAddress();
 				String type=new String(data,"utf-8");
-				if("geter".equals(type))
-					map.put("geter", ip);
-				if("sender".equals(type))
-					map.put("sender", type);
+				if("client".equals(type))
+					map.put("client", ip);
+				if("server".equals(type))
+					map.put("server", type);
 				
 				ByteBuffer buffer=new ByteBuffer();
 				buffer.write(os, "success");
@@ -114,10 +114,10 @@ public class Repeater {
 				os=new DataOutputStream(socket.getOutputStream());
 				ByteBuffer buffer=new ByteBuffer();
 				
-				if(map.get("sender")==null)
+				if(map.get("server")==null)
 					buffer.write(os, "no ip");
 				else
-					buffer.write(os, map.get("sender"));
+					buffer.write(os, "get ip:"+map.get("server"));
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -149,11 +149,38 @@ public class Repeater {
 			this.socket=s;
 		}
 
+		InputStream is;
+		OutputStream os;
 		
 		@Override
 		public void run() {
 			//如果当前已经有被控端了，这里应该替换原来的
+			
+			try {
+				is=new DataInputStream(socket.getInputStream());
+				os=new DataOutputStream(socket.getOutputStream());
+				
+				byte[] data=ByteBuffer.read(is);
+				String ip=socket.getInetAddress().getHostAddress();
+				String type=new String(data,"utf-8");
+				if("client".equals(type))
+					map.put("client", ip);
+				if("server".equals(type))
+					map.put("server", type);
+				
+				ByteBuffer buffer=new ByteBuffer();
+				buffer.write(os, "success");
+				
+				os.close();
+				is.close();
+				
+				System.out.println( type+"注册完毕");
+					
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
 		
 	}
 	

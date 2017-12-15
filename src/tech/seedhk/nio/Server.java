@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import tech.seedhk.bean.ProxyObject;
+import tech.seedhk.netty.NioServerBoss;
 
 
 /**
@@ -28,7 +29,44 @@ import tech.seedhk.bean.ProxyObject;
 public class Server {
 	
 	private Selector selector;
-	private static ExecutorService service=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
+	
+	
+	public static void main(String[] args) throws Exception {
+		//先连接中继器，注册成功后启动Server端
+		Server server=new Server();
+		server.resister("127.0.0.1", 6666);
+		//server.initServer(6666);
+		//server.listen();
+	}
+	
+	
+	private  void resister(String host,int port) throws Exception{
+		Socket s=new Socket(host, port);
+		System.out.println("连接中继器成功");
+		InputStream is=new DataInputStream(s.getInputStream());
+		OutputStream os=new DataOutputStream(s.getOutputStream());
+
+		tech.seedhk.bean.ByteBuffer buffer=new tech.seedhk.bean.ByteBuffer();
+		buffer.write(os, "server");
+		byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
+		String ret=new String(data,"utf-8");
+		System.out.println(ret);
+		if("success".equals(ret)){
+			System.out.println("注册成功，启动sever");
+			is.close();
+			os.close();
+			s.close();
+			System.out.println(s.isClosed());
+			new NioServerBoss(Executors.newCachedThreadPool(), "boss", selector, port);
+		}
+	}
+	
+
+	
+	
+	//-------------------以下代码无法实现线程池+NIO-----------------
+	
+/*private static ExecutorService service=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()*2);
 	
 	private void initServer(int port) throws Exception{
 		ServerSocketChannel ssChannel=ServerSocketChannel.open();
@@ -54,7 +92,24 @@ public class Server {
 			Iterator iterator = selector.selectedKeys().iterator();
 			while(iterator.hasNext()){
 				SelectionKey key=(SelectionKey) iterator.next();
-				service.execute(new Process(key));
+				iterator.remove();
+				if(key.isAcceptable()){
+					try {
+						ServerSocketChannel ssc=(ServerSocketChannel) key.channel();
+						SocketChannel sc=ssc.accept();
+						sc.configureBlocking(false);
+						
+						sc.write(ByteBuffer.wrap("connection success".getBytes()));
+						
+						sc.register(selector, SelectionKey.OP_READ);//如果是已经注册过的事件，比如accept，再次注册会报错
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				if(key.isReadable()){
+					service.execute(new Process(key));
+				}
 			}
 			
 		}
@@ -79,31 +134,31 @@ public class Server {
 					
 					sc.write(ByteBuffer.wrap("connection success".getBytes()));
 					
-					sc.register(selector, SelectionKey.OP_ACCEPT | SelectionKey.OP_READ);
+					sc.register(selector, SelectionKey.OP_READ);//如果是已经注册过的事件，比如accept，再次注册会报错
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 			
-			if(key.isReadable()){
+			//if(key.isReadable()){
 				try {
 					read(key);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
+			//}
 			
 		}
 
 		private void read(SelectionKey key2) throws Exception {
-			ServerSocketChannel ssc=(ServerSocketChannel) key2.channel();
-			SocketChannel sc=ssc.accept();
+			SocketChannel sc=(SocketChannel) key2.channel();
 			
 			ByteBuffer buffer=ByteBuffer.allocate(1024);
 			
 			sc.read(buffer);
+			buffer.flip();
 			
-			rpc(buffer);
+			//rpc(buffer);
 			
 			sc.write(buffer);
 			System.out.println("命令调用完成");
@@ -121,36 +176,6 @@ public class Server {
 			return buffer;
 		}
 		
-	}
-	
-	public static void main(String[] args) throws Exception {
-		//先连接中继器，注册成功后启动Server端
-		Server server=new Server();
-		server.resister("127.0.0.1", 6666);
-	}
-	
-	
-	private  void resister(String host,int port) throws Exception{
-		Socket s=new Socket(host, port);
-		System.out.println("连接中继器成功");
-		InputStream is=new DataInputStream(s.getInputStream());
-		OutputStream os=new DataOutputStream(s.getOutputStream());
-
-		tech.seedhk.bean.ByteBuffer buffer=new tech.seedhk.bean.ByteBuffer();
-		buffer.write(os, "sender");
-		byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
-		String ret=new String(data,"utf-8");
-		System.out.println(ret);
-		if("success".equals(ret)){
-			System.out.println("注册成功，启动sever");
-			is.close();
-			os.close();
-			s.close();
-			System.out.println(s.isClosed());
-			initServer(port);
-		}
-		
-		
-	}
+	}*/
 
 }
