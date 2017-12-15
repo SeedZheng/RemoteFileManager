@@ -182,6 +182,8 @@ public class NioServerBoss implements Runnable{
 				        		body=ret1;
 				        		
 				        	}
+				        	head.flip();
+				        	body.flip();
 				        	 buffers=new ByteBuffer[]{head,body};
 				     		//回写数据
 				     		//ByteBuffer outBuffer = ByteBuffer.wrap(("收到"+retStr).getBytes());

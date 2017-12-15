@@ -51,6 +51,9 @@
 3.break函数跳出循环，会导致中继器的主线程结束，无法接受后续请求
 	解决办法：
 		将break替换为continue；
+4.server端回发数据时，head和body的内容都正常，但是client的channel的read时，head内容变为body内容，原因未知
+	原因：head未flip,当前的position仍然为limit或者capicity,client读取数据时，就直接从body开始读取了
+	解决方法：channel.write()之前先将head flip一次
 	
 	
  	
