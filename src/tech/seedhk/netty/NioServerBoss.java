@@ -175,15 +175,15 @@ public class NioServerBoss implements Runnable{
 				        		head=ByteBuffer.wrap(("file:"+suffix).getBytes());
 				        		body.clear();
 				        		body=ret1;
+				        		body.flip();
 				        	}
 				        	if(type.equals("rpc")){
 				        		ret1=rpc(body);
 				        		body.clear();
 				        		body=ret1;
-				        		
+				        		body.flip();
 				        	}
 				        	head.flip();
-				        	body.flip();
 				        	 buffers=new ByteBuffer[]{head,body};
 				     		//回写数据
 				     		//ByteBuffer outBuffer = ByteBuffer.wrap(("收到"+retStr).getBytes());

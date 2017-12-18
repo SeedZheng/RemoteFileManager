@@ -34,7 +34,7 @@ public class Server {
 	public static void main(String[] args) throws Exception {
 		//先连接中继器，注册成功后启动Server端
 		Server server=new Server();
-		server.resister("127.0.0.1", 6666);
+		server.resister("192.168.147.1", 8888);
 		//server.initServer(6666);
 		//server.listen();
 	}
