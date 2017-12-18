@@ -20,6 +20,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Scanner;
 
+import tech.seedhk.bean.ProxyObject;
+
 /**
  * 控制端，基于NIO,单线程足矣
  * @author Seed
@@ -126,7 +128,7 @@ public class Client {
 		
 		System.out.println("请输入文件类型，text、rpc、getFile");
 		String head=scan.nextLine().trim();
-		System.out.println("请输入数据：");
+		System.out.println("请输入路径：");
 		String body=scan.nextLine().trim();
 		ByteBuffer[] buffer=writeData(head, body);
 		sChannel.write(buffer);
@@ -145,9 +147,18 @@ public class Client {
 			else
 				by[i]='\0';
 		}
-		
 		ByteBuffer head = ByteBuffer.wrap(by);
-		ByteBuffer body = ByteBuffer.wrap(b.trim().getBytes());
+		ByteBuffer body =null;
+		if("rpc".equals(h)){
+			ProxyObject po=ProxyObject.newInstance();
+			po.getMethod("tech.seedhk.utils.FileUtils", "showDire", new Object[]{b.trim()}, String.class);
+			body = ByteBuffer.wrap(ProxyObject.bean2byte(po));
+		}else if("getFile".equals(h)){
+			
+		}else{
+			body = ByteBuffer.wrap(b.trim().getBytes());	
+		}
+		
 		head.flip();
 		body.flip();
 		

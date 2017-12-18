@@ -55,5 +55,9 @@
 	原因：head未flip,当前的position仍然为limit或者capicity,client读取数据时，就直接从body开始读取了
 	解决方法：channel.write()之前先将head flip一次
 	
+12月18日：
+	待完成事项：
+		rpc中的反射
+	
 	
  	

@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Test;
+
 public class FileUtils {
 	
 	
@@ -21,23 +23,25 @@ public class FileUtils {
 	
 	public static String[] showDire(String path){
 		
-		File file=new File(path);
 		String[] fileNames=null;
-		if(file.exists() && file.isDirectory()){
-			File[] files=file.listFiles();
-			if(!isEmpty(files)){
-				fileNames=new String[files.length];
-				for(int i=0;i<files.length;i++){
-					fileNames[i]=files[i].getName()+"\n";
-				}
+		File[] files=null;
+		if("root".equals(path)){
+			 files=File.listRoots();
+		}else{
+			File file=new File(path);
+			if(file.exists() && file.isDirectory()){
+				 files=file.listFiles();
 			}
 		}
 		
+		if(!isEmpty(files)){
+			fileNames=new String[files.length];
+			for(int i=0;i<files.length;i++){
+				fileNames[i]=files[i].getName()+"\n";
+			}
+		}
 		return fileNames;
 	}
-	
-	
-	
 	
 	public static List<Map<String, String>> listDirectory(String path){
 		
@@ -95,6 +99,11 @@ public class FileUtils {
 		byte[] b=new byte[str.length()];
 		b=str.getBytes();
 		System.out.println(b);
+	}
+	
+	@Test
+	public void testSystem(){
+		System.out.println(System.getProperty("os.name"));
 	}
 
 }
