@@ -148,6 +148,8 @@ public class Client {
 		
 		ByteBuffer head = ByteBuffer.wrap(by);
 		ByteBuffer body = ByteBuffer.wrap(b.trim().getBytes());
+		head.flip();
+		body.flip();
 		
 		return new ByteBuffer[]{head,body};
 	}
@@ -161,7 +163,7 @@ public class Client {
 		System.out.println("收到的数据类型为: "+type);
 		
 		if(type.equals("text") || type.equals("rpc")){
-			String msg=new String(h.array()).trim();
+			String msg=new String(b.array()).trim();
 			System.out.println("数据内容："+msg);
 		}
 		
