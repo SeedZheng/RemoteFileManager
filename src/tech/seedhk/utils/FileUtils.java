@@ -27,19 +27,25 @@ public class FileUtils {
 		File[] files=null;
 		if("root".equals(path)){
 			 files=File.listRoots();
+			 fileNames=new String[files.length];
+			 for(int i=0;i<files.length;i++){
+					File file=files[i];
+					fileNames[i]=file.getAbsolutePath();
+				}
 		}else{
 			File file=new File(path);
 			if(file.exists() && file.isDirectory()){
 				 files=file.listFiles();
 			}
-		}
-		
-		if(!isEmpty(files)){
-			fileNames=new String[files.length];
-			for(int i=0;i<files.length;i++){
-				fileNames[i]=files[i].getName()+"\n";
+			if(!isEmpty(files)){
+				fileNames=new String[files.length];
+				for(int i=0;i<files.length;i++){
+					fileNames[i]=files[i].getName()+"\n";
+				}
 			}
 		}
+		
+		
 		return fileNames;
 	}
 	

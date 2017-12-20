@@ -131,16 +131,28 @@ public class ProxyObject implements Serializable{
 	public static ByteBuffer bean2Buffer(Object obj){
 		
 		byte[] b=null;
-		
-		try {
-			ByteArrayOutputStream baos=new ByteArrayOutputStream();
-			ObjectOutputStream oos=new ObjectOutputStream(baos);
-			oos.writeObject(obj);
-			b = baos.toByteArray();
-		} catch (IOException e) {
-			e.printStackTrace();
+		String[] strs=null;
+		ByteBuffer buffer=null;
+		if(obj instanceof String[]){
+			strs=(String[])obj;
+			StringBuilder sb=new StringBuilder();
+			for(int i=0;i<strs.length;i++){
+			sb.append(strs[i]);	
+			}
+			buffer=ByteBuffer.wrap(sb.toString().getBytes());
+		}else{
+			try {
+				ByteArrayOutputStream baos=new ByteArrayOutputStream();
+				ObjectOutputStream oos=new ObjectOutputStream(baos);
+				oos.writeObject(obj);
+				b = baos.toByteArray();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			buffer=ByteBuffer.wrap(b);
 		}
-		ByteBuffer buffer=ByteBuffer.wrap(b);
+		
+		
 		return buffer;
 	}
 	

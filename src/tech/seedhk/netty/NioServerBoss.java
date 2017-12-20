@@ -165,25 +165,27 @@ public class NioServerBoss implements Runnable{
 				        	if(type.equals("text")){
 				        		String retStr=new String(body.array()).trim();
 					        	 System.out.println("收到数据:" + retStr);
+					        	 head.flip();
 					        	 body=ByteBuffer.wrap(("收到数据:" + retStr).getBytes());
 				        	}
 				        	
 				        	if(type.equals("getFile")){
 				        		String filePath=new String(body.array()).trim();
-				        		String suffix=filePath.substring(filePath.lastIndexOf("."));
+				        		String suffix=filePath.substring(filePath.lastIndexOf(".")+1);
 				        		ret1=getFile(filePath);
-				        		head=ByteBuffer.wrap(("file:"+suffix).getBytes());
+				        		head=ByteBuffer.wrap(("file:"+suffix).getBytes());//WRAP方法后无需flip
 				        		body.clear();
 				        		body=ret1;
-				        		body.flip();
+				        		//body.flip();
 				        	}
 				        	if(type.equals("rpc")){
 				        		ret1=rpc(body);
 				        		body.clear();
+				        		head.flip();
 				        		body=ret1;
-				        		body.flip();
+				        		//body.flip();
 				        	}
-				        	head.flip();
+				        	
 				        	 buffers=new ByteBuffer[]{head,body};
 				     		//回写数据
 				     		//ByteBuffer outBuffer = ByteBuffer.wrap(("收到"+retStr).getBytes());
@@ -218,15 +220,20 @@ public class NioServerBoss implements Runnable{
 	private ByteBuffer getFile(String filePath) throws Exception{
 		
 		File file=new File(filePath);
-		if(!file.exists())
-			return null;
-		if(file.isDirectory())
-			return null;
-		
+		ByteBuffer ret=null;
+		if(!file.exists()){
+			ret=ByteBuffer.wrap("该文件不存在".getBytes());
+			return ret;
+		}
+		if(file.isDirectory()){
+			ret=ByteBuffer.wrap("该文件是目录".getBytes());
+			return ret;
+		}
+
 		RandomAccessFile raf=new RandomAccessFile(file, "r");
 		
 		FileChannel fc=raf.getChannel();
-		ByteBuffer ret=ByteBuffer.allocate((int) raf.length());
+		 ret=ByteBuffer.allocate((int) raf.length());
 		fc.read(ret);
 		raf.close();
 		fc.close();
