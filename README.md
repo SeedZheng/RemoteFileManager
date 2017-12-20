@@ -58,6 +58,10 @@
 12月18日：
 	待完成事项：
 		rpc中的反射
+12月20日
+	发现问题：
+		1.client端getFile方法 收到数据类型为：file:.cpp� 出现乱码
+		2.client端接收到的数据只有一部分#inclide 
 	
 	
  	

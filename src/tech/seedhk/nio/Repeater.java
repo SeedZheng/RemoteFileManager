@@ -36,6 +36,7 @@ public class Repeater {
 		System.out.println("repeater starting");
 		while(true){
 			Socket s = ss.accept();
+			System.out.println("当前socket的hashcode："+s.hashCode());
 			String ip=s.getInetAddress().getHostAddress();
 			System.out.println("ip："+ip);
 			if(map.get("server")!=null){
@@ -88,6 +89,7 @@ public class Repeater {
 				
 				os.close();
 				is.close();
+				socket.close();
 				
 				System.out.println( type+"注册完毕");
 					
@@ -125,15 +127,17 @@ public class Repeater {
 				if(map.get("server")==null)
 					buffer.write(os, "no ip");
 				else
-					buffer.write(os, "get ip:"+map.get("server"));
+					buffer.write(os, "getip:"+map.get("server"));
 				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}finally {
 				try {
+					//延时3秒再关闭
+					Thread.sleep(3000);
 					os.close();
 					socket.close();
-				} catch (IOException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -174,13 +178,14 @@ public class Repeater {
 				if("client".equals(type))
 					map.put("client", ip);
 				if("server".equals(type))
-					map.put("server", type);
+					map.put("server", ip);
 				
 				ByteBuffer buffer=new ByteBuffer();
 				buffer.write(os, "success");
 				
 				os.close();
 				is.close();
+				//socket.close();
 				
 				System.out.println( type+"注册完毕");
 					

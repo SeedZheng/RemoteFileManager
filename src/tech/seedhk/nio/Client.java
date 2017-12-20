@@ -49,10 +49,14 @@ public class Client {
 
 			tech.seedhk.bean.ByteBuffer buffer=new tech.seedhk.bean.ByteBuffer();
 			buffer.write(os, "client");
+			System.out.println(is.available());
 			byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
 			String ret=new String(data,"utf-8");
 			System.out.println(ret);
-			if(ret.contains("get ip")){
+			is.close();
+			os.close();
+			s.close();
+			if(ret.contains("getip")){
 				String ip=ret.substring(ret.indexOf(":")+1);
 				System.out.println("已获取到IP地址，地址是: "+ip);
 				is.close();
@@ -132,7 +136,7 @@ public class Client {
 		String body=scan.nextLine().trim();
 		ByteBuffer[] buffer=writeData(head, body);
 		sChannel.write(buffer);
-		scan.close();
+		//scan.close();
 		
 		
 	}
@@ -154,13 +158,13 @@ public class Client {
 			po.getMethod("tech.seedhk.utils.FileUtils", "showDire", new Object[]{b.trim()}, String.class);
 			body = ByteBuffer.wrap(ProxyObject.bean2byte(po));
 		}else if("getFile".equals(h)){
-			
+			body = ByteBuffer.wrap(b.trim().getBytes());
 		}else{
 			body = ByteBuffer.wrap(b.trim().getBytes());	
 		}
 		
-		head.flip();
-		body.flip();
+		//head.position(0);
+		//body.position(0);
 		
 		return new ByteBuffer[]{head,body};
 	}
