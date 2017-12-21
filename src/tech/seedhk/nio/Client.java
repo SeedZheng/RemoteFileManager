@@ -185,7 +185,8 @@ public class Client {
 		if(type.contains("file")){
 			String suffix=type.substring(type.indexOf(":"));
 			byte[] data=b.array();
-			File file=new File("data"+suffix);
+			String basicPath=System.getProperty("user.dir");
+			File file=new File(basicPath+File.separator+"file"+suffix);
 			FileOutputStream fos=new FileOutputStream(file);
 			fos.write(data);
 			fos.flush();
