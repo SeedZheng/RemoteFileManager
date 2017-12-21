@@ -132,7 +132,7 @@ public class NioServerBoss implements Runnable{
 						// 数据总长度
 						long ret = 0;
 						boolean failure = true;
-						ByteBuffer head=ByteBuffer.allocate(10);
+						ByteBuffer head=ByteBuffer.allocate(26);
 			        	ByteBuffer body=ByteBuffer.allocate(1024);
 			        	ByteBuffer[] buffers=new ByteBuffer[]{head,body};
 						//读取数据
@@ -171,7 +171,7 @@ public class NioServerBoss implements Runnable{
 				        	
 				        	if(type.equals("getFile")){
 				        		String filePath=new String(body.array()).trim();
-				        		String suffix=filePath.substring(filePath.lastIndexOf(".")+1);
+				        		String suffix=filePath.substring(filePath.lastIndexOf("."));
 				        		ret1=getFile(filePath);
 				        		//head=ByteBuffer.wrap(("file:"+suffix).getBytes());//WRAP方法后无需flip
 				        		head=prepareHead("file:"+suffix);
@@ -247,7 +247,7 @@ public class NioServerBoss implements Runnable{
 		
 		byte[] b=buffer.array();
 		StringBuilder sb=new StringBuilder();
-		for(int i=0;i<b.length-1;i++){
+		for(int i=0;i<b.length-2;i++){
 			sb.append((char)b[i]);
 		}
 		ByteBuffer head=ByteBuffer.wrap(sb.toString().trim().getBytes());
