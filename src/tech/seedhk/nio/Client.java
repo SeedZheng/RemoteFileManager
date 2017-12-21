@@ -143,15 +143,15 @@ public class Client {
 	
 	private ByteBuffer[] writeData(String h,String b){
 		
-		byte[] by=new byte[10];
-		byte[] data=h.trim().getBytes();
-		for(int i=0;i<by.length;i++){
-			if(i<data.length)
-					by[i]=data[i];
-			else
-				by[i]='\0';
-		}
-		ByteBuffer head = ByteBuffer.wrap(by);
+		//byte[] by=new byte[10];
+		//byte[] data=h.trim().getBytes();
+		//for(int i=0;i<by.length;i++){
+		//	if(i<data.length)
+		//			by[i]=data[i];
+		//	else
+		//		by[i]='\0';
+		//}
+		ByteBuffer head = prepareHead(h);
 		ByteBuffer body =null;
 		if("rpc".equals(h)){
 			ProxyObject po=ProxyObject.newInstance();
@@ -172,6 +172,7 @@ public class Client {
 	private void getData(ByteBuffer[] buffers) throws Exception{
 		
 		ByteBuffer h=buffers[0];
+		h=getHead(h);
 		ByteBuffer b=buffers[1];
 		
 		String type=new String(h.array()).trim();
@@ -194,5 +195,51 @@ public class Client {
 			System.out.println("文件输出完毕");
 		}
 	}
+	
+	private ByteBuffer getHead(ByteBuffer buffer){
+		
+		byte[] b=buffer.array();
+		StringBuilder sb=new StringBuilder();
+		for(int i=0;i<b.length-1;i++){
+			sb.append((char)b[i]);
+		}
+		ByteBuffer head=ByteBuffer.wrap(sb.toString().trim().getBytes());
+		return head;
+	}
 
+	
+	private ByteBuffer prepareHead(String data){
+		
+		ByteBuffer head=ByteBuffer.allocate(26);//0-25
+		
+		byte[] b=data.trim().getBytes();
+		head.put(b);
+		if(head.position()>=24) System.err.println("缓冲区大小溢出");
+		else{
+			head.position(24);
+			head.limit(head.capacity());
+			head.put((byte)'$');
+			head.put((byte)'&');
+		}
+		head.flip();
+		return head;
+	}
+	
+	private ByteBuffer prepareHead(ByteBuffer data){
+		
+		ByteBuffer head=ByteBuffer.allocate(26);//0-25
+		
+		while(data.hasRemaining())
+			head.put(data.get());
+		
+		if(head.position()>=24) System.err.println("缓冲区大小溢出");
+		else{
+			head.position(24);
+			head.limit(head.capacity());
+			head.put((byte)'$');
+			head.put((byte)'&');
+		}
+		head.flip();
+		return head;
+	}
 }

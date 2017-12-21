@@ -157,7 +157,7 @@ public class NioServerBoss implements Runnable{
 				        	 * 		file:文件
 				        	 * buffer2:数据内容
 				        	 */
-				        	String type=new String(head.array()).trim();
+				        	String type=new String(getHead(head).array()).trim();
 				        	System.out.println(type);
 				        	
 				        	ByteBuffer ret1 = null;
@@ -173,7 +173,8 @@ public class NioServerBoss implements Runnable{
 				        		String filePath=new String(body.array()).trim();
 				        		String suffix=filePath.substring(filePath.lastIndexOf(".")+1);
 				        		ret1=getFile(filePath);
-				        		head=ByteBuffer.wrap(("file:"+suffix).getBytes());//WRAP方法后无需flip
+				        		//head=ByteBuffer.wrap(("file:"+suffix).getBytes());//WRAP方法后无需flip
+				        		head=prepareHead("file:"+suffix);
 				        		body.clear();
 				        		body=ret1;
 				        		//body.flip();
@@ -182,6 +183,7 @@ public class NioServerBoss implements Runnable{
 				        		ret1=rpc(body);
 				        		body.clear();
 				        		head.flip();
+				        		head=prepareHead(head);
 				        		body=ret1;
 				        		//body.flip();
 				        	}
@@ -240,4 +242,53 @@ public class NioServerBoss implements Runnable{
 		ret.flip();//转换读写模式
 		return ret;
 	}
+	
+	private ByteBuffer getHead(ByteBuffer buffer){
+		
+		byte[] b=buffer.array();
+		StringBuilder sb=new StringBuilder();
+		for(int i=0;i<b.length-1;i++){
+			sb.append((char)b[i]);
+		}
+		ByteBuffer head=ByteBuffer.wrap(sb.toString().trim().getBytes());
+		return head;
+	}
+	
+	
+	private ByteBuffer prepareHead(String data){
+		
+		ByteBuffer head=ByteBuffer.allocate(26);//0-25
+		
+		byte[] b=data.trim().getBytes();
+		head.put(b);
+		if(head.position()>=24) System.err.println("缓冲区大小溢出");
+		else{
+			head.position(24);
+			head.limit(head.capacity());
+			head.put((byte)'$');
+			head.put((byte)'&');
+		}
+		head.flip();
+		return head;
+	}
+	
+	private ByteBuffer prepareHead(ByteBuffer data){
+		
+		ByteBuffer head=ByteBuffer.allocate(26);//0-25
+		
+		while(data.hasRemaining())
+			head.put(data.get());
+		
+		if(head.position()>=24) System.err.println("缓冲区大小溢出");
+		else{
+			head.position(24);
+			head.limit(head.capacity());
+			head.put((byte)'$');
+			head.put((byte)'&');
+		}
+		head.flip();
+		return head;
+	}
+	
+	
 }

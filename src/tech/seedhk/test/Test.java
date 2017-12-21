@@ -148,7 +148,7 @@ public class Test {
 	
 	@org.junit.Test
 	public void testDir(){
-		System.out.println(System.getProperty("user.dir"));
+		System.err.println(System.getProperty("user.dir"));
 	}
 
 }
