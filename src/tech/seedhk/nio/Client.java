@@ -123,7 +123,7 @@ public class Client {
 	private void read(SelectionKey key) throws Exception {
 		SocketChannel sChannel=(SocketChannel) key.channel();
 		
-		ByteBuffer[] buffers=new ByteBuffer[]{ByteBuffer.allocate(10),ByteBuffer.allocate(1024)};
+		ByteBuffer[] buffers=new ByteBuffer[]{ByteBuffer.allocate(26),ByteBuffer.allocate(1024*1024)};
 		
 		sChannel.read(buffers);
 		getData(buffers);
@@ -174,6 +174,7 @@ public class Client {
 		ByteBuffer h=buffers[0];
 		h=getHead(h);
 		ByteBuffer b=buffers[1];
+		int bodyPosition=b.position();
 		
 		String type=new String(h.array()).trim();
 		System.out.println("收到的数据类型为: "+type);
@@ -184,12 +185,12 @@ public class Client {
 		}
 		
 		if(type.contains("file")){
-			String suffix=type.substring(type.indexOf(":"));
+			String suffix=type.substring(type.indexOf(":")+1);
 			byte[] data=b.array();
 			String basicPath=System.getProperty("user.dir");
 			File file=new File(basicPath+File.separator+"file"+suffix);
 			FileOutputStream fos=new FileOutputStream(file);
-			fos.write(data);
+			fos.write(data,0,bodyPosition);
 			fos.flush();
 			fos.close();
 			System.out.println("文件输出完毕");
@@ -200,7 +201,7 @@ public class Client {
 		
 		byte[] b=buffer.array();
 		StringBuilder sb=new StringBuilder();
-		for(int i=0;i<b.length-1;i++){
+		for(int i=0;i<b.length-2;i++){
 			sb.append((char)b[i]);
 		}
 		ByteBuffer head=ByteBuffer.wrap(sb.toString().trim().getBytes());

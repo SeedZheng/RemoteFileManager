@@ -66,6 +66,10 @@
 		2.传输回的数据发生中文乱码情况
 			原因：文件本身乱码
 		3.client端文件输出失败
+			原因：文件格式不对(如后缀名)导致文件输出失败
+		4.body中文件大小过大会失败，过小会导致输出NULL
+		  	解决办法：channel.read(buffer)的时候，会将当前的position置为server端body的limit(原因是因为read操作本身就会修改当前position的位置)
+		  	获取即可
 	
 	
  	
