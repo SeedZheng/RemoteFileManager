@@ -237,7 +237,7 @@ public class NioServerBoss implements Runnable{
 		fc.read(ret);
 		raf.close();
 		fc.close();
-		
+		ret.flip();//转换读写模式
 		return ret;
 	}
 }
