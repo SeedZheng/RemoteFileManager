@@ -150,5 +150,22 @@ public class Test {
 	public void testDir(){
 		System.err.println(System.getProperty("user.dir"));
 	}
+	
+	@org.junit.Test
+	public void testi2b(){
+		byte[] b=i2b(10);
+		System.out.println(b.length);
+	}
+	
+	
+	private byte[] i2b(int i) {
+        //4个字节
+       return new byte[] {
+                          (byte) ((i >> 24) & 0xFF),    
+                     (byte) ((i >> 16) & 0xFF),    
+                     (byte) ((i >> 8) & 0xFF),     
+                     (byte) (i & 0xFF),  
+     };
+   }
 
 }

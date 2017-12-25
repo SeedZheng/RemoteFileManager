@@ -70,6 +70,12 @@
 		4.body中文件大小过大会失败，过小会导致输出NULL
 		  	解决办法：channel.read(buffer)的时候，会将当前的position置为server端body的limit(原因是因为read操作本身就会修改当前position的位置)
 		  	获取即可
+12月25日
+	发现问题：
+		1.server端发送数据后，client端直接受到128K
+			原因：client端需要取多次
+		2.client采用返回值是否为0(无数据)或者-1(该通道已到达流的末尾)，多次读取，但是还是获取不到完整的文件数据
+			猜测原因：server端发送数据是分段的
 	
 	
  	
