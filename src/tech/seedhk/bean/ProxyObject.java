@@ -128,6 +128,11 @@ public class ProxyObject implements Serializable{
 		return b;
 	}
 	
+	/**
+	 * 将一个对象转换成ByteBuffer，无需flip
+	 * @param obj
+	 * @return
+	 */
 	public static ByteBuffer bean2Buffer(Object obj){
 		
 		byte[] b=null;
@@ -151,8 +156,6 @@ public class ProxyObject implements Serializable{
 			}
 			buffer=ByteBuffer.wrap(b);
 		}
-		
-		
 		return buffer;
 	}
 	

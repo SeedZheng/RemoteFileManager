@@ -16,6 +16,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import tech.seedhk.bean.ProxyObject;
+import tech.seedhk.buffer.BodyBuffer;
+import tech.seedhk.buffer.BodyProcess;
+import tech.seedhk.buffer.DataBuffer;
 
 public class NioServerBoss implements Runnable{
 	
@@ -130,13 +133,22 @@ public class NioServerBoss implements Runnable{
 						SocketChannel channel = (SocketChannel) key.channel();
 						
 						// 数据总长度
-						long ret = 0;
-						boolean failure = true;
-						ByteBuffer head=ByteBuffer.allocate(26);
-			        	ByteBuffer body=ByteBuffer.allocate(1024);
-			        	ByteBuffer[] buffers=new ByteBuffer[]{head,body};
+						//long ret = 0;
+						//boolean failure = true;
+						//ByteBuffer head=ByteBuffer.allocate(26);
+			        	//ByteBuffer body=ByteBuffer.allocate(1024);
+			        	//ByteBuffer[] buffers=new ByteBuffer[]{head,body};
+						DataBuffer data_buf=new DataBuffer();
+						long body_size=data_buf.getHead(channel);
+						if(body_size<0){
+							key.cancel();
+							System.out.println("客户端断开连接");
+							isStop=true;
+							break;	//该线程退出
+						}
+						
 						//读取数据
-						try {
+/*						try {
 							ret = channel.read(buffers);
 							failure = false;
 						} catch (Exception e) {
@@ -144,11 +156,15 @@ public class NioServerBoss implements Runnable{
 						}
 						//判断是否连接已断开
 						if (ret <= 0 || failure) {
+						if (ret <= 0) {
 							key.cancel();
 							System.out.println("客户端断开连接");
 							isStop=true;
 							break;	//该线程退出
-				        }else{
+				        }*/
+						else{
+				        	BodyBuffer body_buf=data_buf.getBody((int)body_size, channel);
+				        	BodyProcess.processServer(body_buf, channel);
 				        	/*
 				        	 * 数据发送接收协议：
 				        	 * buffer1：数据类型(大小为4个字节)
@@ -157,7 +173,7 @@ public class NioServerBoss implements Runnable{
 				        	 * 		file:文件
 				        	 * buffer2:数据内容
 				        	 */
-				        	String type=new String(getHead(head).array()).trim();
+				        	/*String type=new String(getHead(head).array()).trim();
 				        	System.out.println(type);
 				        	
 				        	ByteBuffer ret1 = null;
@@ -192,7 +208,7 @@ public class NioServerBoss implements Runnable{
 				     		//回写数据
 				     		//ByteBuffer outBuffer = ByteBuffer.wrap(("收到"+retStr).getBytes());
 				     		channel.write(buffers);// 将消息回送给客户端
-				        }
+*/				        }
 					}
 					
 				}

@@ -1,18 +1,13 @@
 package tech.seedhk.nio;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -21,6 +16,9 @@ import java.util.Iterator;
 import java.util.Scanner;
 
 import tech.seedhk.bean.ProxyObject;
+import tech.seedhk.buffer.BodyBuffer;
+import tech.seedhk.buffer.BodyProcess;
+import tech.seedhk.buffer.DataBuffer;
 
 /**
  * 控制端，基于NIO,单线程足矣
@@ -123,7 +121,12 @@ public class Client {
 	private void read(SelectionKey key) throws Exception {
 		SocketChannel sChannel=(SocketChannel) key.channel();
 		
-		ByteBuffer[] buffers=new ByteBuffer[]{ByteBuffer.allocate(26),ByteBuffer.allocate(1024*1024*20)};
+		DataBuffer data_buf=new DataBuffer();
+		long body_size=data_buf.getHead(sChannel);
+		BodyBuffer body_buf=data_buf.getBody((int)body_size, sChannel);
+		BodyProcess.processClient(body_buf, sChannel);
+		
+		/*ByteBuffer[] buffers=new ByteBuffer[]{ByteBuffer.allocate(26),ByteBuffer.allocate(1024*1024*20)};
 		long ret=-2;
 		while(ret!=-1 && ret!=0){
 			ret=sChannel.read(buffers);
@@ -138,7 +141,7 @@ public class Client {
 		System.out.println("请输入路径：");
 		String body=scan.nextLine().trim();
 		ByteBuffer[] buffer=writeData(head, body);
-		sChannel.write(buffer);
+		sChannel.write(buffer);*/
 		//scan.close();
 		
 		
