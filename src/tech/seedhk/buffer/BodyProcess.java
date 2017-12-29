@@ -21,6 +21,11 @@ public class BodyProcess {
 	
 	public static void  processClient(BodyBuffer body,SocketChannel channel) throws IOException{
 		
+		if(body==null){
+			System.out.println("body is null");
+			return;
+		}
+		
 		String cmd=body.getCmd();
 		Object content=body.getContent();
 		ByteBuffer attach=null;
@@ -63,6 +68,11 @@ public class BodyProcess {
 	}
 	
 	public static void processServer(BodyBuffer body,SocketChannel channel) throws Exception{
+		
+		if(body==null){
+			System.out.println("body is null");
+			return;
+		}
 		
 		String cmd=body.getCmd();
 		Object content=body.getContent();
