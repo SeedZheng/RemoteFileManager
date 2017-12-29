@@ -13,10 +13,11 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 
 import tech.seedhk.bean.ProxyObject;
+import tech.seedhk.utils.Log;
 
 public class BodyProcess {
 	
-	private static Logger log=Logger.getLogger(BodyProcess.class);
+	private static Logger log=Log.getInstance(BodyProcess.class);
 	
 	
 	public static void  processClient(BodyBuffer body,SocketChannel channel) throws IOException{
@@ -34,7 +35,7 @@ public class BodyProcess {
 			attach=body.getAttach();
 			attachName=body.getAttachName();
 		}
-		log.info("content 的文件类型是："+content.getClass().getName());
+		//log.info("content 的文件类型是："+content.getClass().getName());
 		
 		log.info("收到的命令为："+cmd);
 		
@@ -156,6 +157,8 @@ public class BodyProcess {
 	
 	
 	private static BodyBuffer writeData(String h,String b){
+		
+		log.info("本次欲发送的命令为： "+h+"，本次欲发送的内容为： "+b);
 
 		BodyBuffer body_buff=new BodyBuffer();
 		
