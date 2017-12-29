@@ -13,6 +13,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import tech.seedhk.utils.Log;
+
 /**
  * 目的：
  * 	  整合head和body的数据，并根据headBuffer中的分隔符对数据进行分块，分段传输
@@ -34,7 +36,7 @@ public class DataBuffer implements Serializable{
 	 *  5.先发送headBuffer
 	 *  6.睡眠1s，对每个segment都进行write操作(是否可行待测试)
 	 */
-	private Logger log=Logger.getLogger(this.getClass());
+	private Logger log=Log.getInstance(this.getClass());
 	private static final long serialVersionUID = 1L;
 	//private static final  byte[] dataSep;	//segment分隔符
 	private static final byte[] dataEnd;	//数据结束符
@@ -171,7 +173,31 @@ public class DataBuffer implements Serializable{
 	}
 	
 	public static void main(String[] args) {
-		//测试head部分的数据截取问题
+		//测试body数据不完整的问题
+		byte[] b=new byte[]{-84, -19, 0  , 5  , 115, 114, 0  , 29 , 116, 101, 99 , 104, 46 , 115, 101, 101, 100, 104, 107, 46 , 
+							98 , 117, 102, 102, 101, 114, 46 , 66 , 111, 100, 121, 66 , 117, 102, 102, 101, 114, 0  , 0  , 0  , 
+							0  , 0  , 0  , 0  , 1  , 2  , 0  , 6  , 90 , 0  , 9  , 104, 97 , 115, 65 , 116, 116, 97 , 99 , 104, 
+							90 , 0  , 7  , 105, 115, 82 , 101, 97 , 100, 121, 76 , 0  , 6  , 97 , 116, 116, 97 , 99 , 104, 116, 
+							0  , 21 , 76 , 106, 97 , 118, 97 , 47 , 110, 105, 111, 47 , 66 , 121, 116, 101, 66 , 117, 102, 102, 
+							101, 114, 59 , 76 , 0  , 10 , 97 , 116, 116, 97 , 99 , 104, 78 , 97 , 109, 101, 116, 0  , 18 , 76 , 
+							106, 97 , 118, 97 , 47 , 108, 97 , 110, 103, 47 , 83 , 116, 114, 105, 110, 103, 59 , 76 , 0  , 3  , 
+							99 , 109, 100, 113, 0  , 126, 0  , 2  , 76 , 0  , 7  , 99 , 111, 110, 116, 101, 110, 116, 116, 0  , 
+							18 , 76 , 106, 97 , 118, 97 , 47 , 108, 97 , 110, 103, 47 , 79 , 98 , 106, 101, 99 , 116, 59 , 120, 
+							112, 0  , 1  , 112, 112, 116, 0  , 4  , 116, 101, 120, 116, 116, 0  , 33 , -27, -112, -111, -26, -100, 
+							-115, -27, -118, -95, -25, -85, -81,
+		                      -27, -113, -111, -23, -128, -127, -28, -70, -122, -28, -72, -128, -26, -99, -95, -26, -74, -120, -26, -127, 
+		                      -81, 98, 101, 95, 36};
+		System.out.println(b.length);
+		System.out.println();
+		System.out.println(b[b.length-4]);
+		System.out.println(b[b.length-3]);
+		System.out.println(b[b.length-2]);
+		System.out.println(b[b.length-1]);
+		
+		
+		
+		
+		/*//测试head部分的数据截取问题
 		byte[] head=new byte[]{'h','s','_','$','d','a','t','a','h','e','_','$','1','1','0','2','3'};
 		byte[] head_start=HeadBuffer.getHeadStart();
 		byte[] head_end=HeadBuffer.getHeadEnd();
@@ -189,7 +215,7 @@ public class DataBuffer implements Serializable{
 		for(int i=0;i<h.length;i++){
 			System.out.print((char)h[i]);
 			System.out.print(" ");
-		}
+		}*/
 		
 		
 	}
@@ -214,7 +240,7 @@ public class DataBuffer implements Serializable{
 		}else{
 			log.info("本次接收到的body大小是： "+sum);
 			byte[] b=body.array();
-			if(b[b.length-3]==dataEnd[0] && b[b.length-2]==dataEnd[1] && b[b.length-1]==dataEnd[2]){
+			if(b[b.length-4]==dataEnd[0] && b[b.length-3]==dataEnd[1] && b[b.length-2]==dataEnd[2] & b[b.length-1]==dataEnd[3]){
 				byte[] d=Arrays.copyOf(b, body_size-4);
 				BodyBuffer buffer=(BodyBuffer) byte2Bean(d);
 				return buffer;
