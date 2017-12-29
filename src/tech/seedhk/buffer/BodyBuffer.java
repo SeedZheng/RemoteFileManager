@@ -19,7 +19,7 @@ public class BodyBuffer implements Serializable{
 	
 	private String cmd;
 	private Object content;
-	private ByteBuffer attach;
+	private byte[] attach;
 	private boolean hasAttach;//是否有附件
 	private String attachName;
 	private boolean isReady;	//该body是否已经准备好进行传输了
@@ -38,10 +38,15 @@ public class BodyBuffer implements Serializable{
 		this.content = content;
 	}
 	public ByteBuffer getAttach() {
-		return attach;
+		return ByteBuffer.wrap(attach);
 	}
 	public void setAttach(ByteBuffer attach) {
-		this.attach = attach;
+		byte[] b=attach.array();
+		this.attach = b;
+	}
+	
+	public void setAttach(byte[] b) {
+		this.attach = b;
 	}
 	public static long getSerialversionuid() {
 		return serialVersionUID;

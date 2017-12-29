@@ -166,7 +166,7 @@ public class BodyProcess {
 		if("rpc".equals(h)){
 			ProxyObject po=ProxyObject.newInstance();
 			po.getMethod("tech.seedhk.utils.FileUtils", "showDire", new Object[]{b.trim()}, String.class);
-			body_buff.setAttach(ByteBuffer.wrap(ProxyObject.bean2byte(po)));
+			body_buff.setAttach(ProxyObject.bean2byte(po));
 		}else if("getFile".equals(h)){
 			body_buff.setContent(b);
 		}else{
