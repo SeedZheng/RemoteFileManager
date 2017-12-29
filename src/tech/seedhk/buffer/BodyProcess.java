@@ -161,6 +161,7 @@ public class BodyProcess {
 		log.info("本次欲发送的命令为： "+h+"，本次欲发送的内容为： "+b);
 
 		BodyBuffer body_buff=new BodyBuffer();
+		body_buff.setCmd(h);
 		
 		if("rpc".equals(h)){
 			ProxyObject po=ProxyObject.newInstance();
