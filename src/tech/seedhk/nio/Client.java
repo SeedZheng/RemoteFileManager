@@ -104,8 +104,18 @@ public class Client {
 					
 					channel.configureBlocking(false);
 					
+					BodyBuffer body=new BodyBuffer();
+					body.setCmd("text");
+					body.setContent("向服务端发送了一条消息");
+					body.setReady(true);
+					
+					DataBuffer db=new DataBuffer();
+					db.setBody(body);
+					db.sendHead(channel);
+					db.sendBody(channel);
+					
 					//channel.write(ByteBuffer.wrap("向服务端发送了一条消息".getBytes()));
-					channel.write(writeData("text","向服务端发送了一条消息"));
+					//channel.write(writeData("text","向服务端发送了一条消息"));
 					
 					channel.register(this.selector, SelectionKey.OP_READ);
 				}else if(key.isReadable()){

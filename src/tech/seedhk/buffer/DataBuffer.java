@@ -98,7 +98,11 @@ public class DataBuffer implements Serializable{
 		
 		long start=System.currentTimeMillis();
 		
+		if(this.head==null)
+			this.head=new HeadBuffer();
+		
 		HeadBuffer buffer=this.head;
+		
 		if(this.body!=null || this.body.isReady()){
 			buff=bean2Buffer(this.body);
 			int buff_size=buff.limit()+4;
@@ -151,11 +155,11 @@ public class DataBuffer implements Serializable{
 		byte[] head_end=HeadBuffer.getHeadEnd();
 		
 		for(int i=0;i<b.length-2;i++){
-			if(b[0]==head_start[0] && b[1]==head_start[1] && b[2]==head_start[2]){
+			if(b[0]==head_start[0] && b[1]==head_start[1] && b[2]==head_start[2]  && b[3]==head_start[3]){
 				//head开始
-				if(b[i]==head_end[0] && b[i+1]==head_end[1] && b[i+2]==head_end[2]){
+				if(b[i]==head_end[0] && b[i+1]==head_end[1] && b[i+2]==head_end[2] && b[i+3]==head_end[3]){
 					//i以前是完整的head
-					h=Arrays.copyOf(b, i-1);
+					h=Arrays.copyOfRange(b,4, i);
 				}
 			}
 			
@@ -164,6 +168,30 @@ public class DataBuffer implements Serializable{
 		HeadBuffer head_buff=(HeadBuffer) byte2Bean(h);
 		
 		return head_buff.getBody_size();
+	}
+	
+	public static void main(String[] args) {
+		//测试head部分的数据截取问题
+		byte[] head=new byte[]{'h','s','_','$','d','a','t','a','h','e','_','$','1','1','0','2','3'};
+		byte[] head_start=HeadBuffer.getHeadStart();
+		byte[] head_end=HeadBuffer.getHeadEnd();
+		byte[] h=new byte[head.length-8];	//减去头部的4个字节和尾部的4个字节
+		for(int i=0;i<head.length-3;i++){
+			if(head[0]==head_start[0] && head[1]==head_start[1] && head[2]==head_start[2] && head[3]==head_start[3]){
+				//head开始
+				if(head[i]==head_end[0] && head[i+1]==head_end[1] && head[i+2]==head_end[2] && head[i+3]==head_end[3]){
+					//i以前是完整的head
+					h=Arrays.copyOfRange(head,4, i);
+				}
+			}
+			
+		}
+		for(int i=0;i<h.length;i++){
+			System.out.print((char)h[i]);
+			System.out.print(" ");
+		}
+		
+		
 	}
 	
 	
