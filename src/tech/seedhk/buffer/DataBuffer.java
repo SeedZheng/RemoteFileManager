@@ -132,19 +132,19 @@ public class DataBuffer implements Serializable{
 	
 	public long getHead(SocketChannel channel){
 		ByteBuffer buffer=ByteBuffer.allocate(1024);
+		int n=0;
 		try {
-			
-			int n=channel.read(buffer);
+			n=channel.read(buffer);
 			log.info("本次拿到的head大小是: "+n);
 			//如果head拿到的是0.那么代表有客户端退出
-			if(n==0){
-				return -1;
-			}
-			
 		} catch (IOException e) {
-			e.printStackTrace();
+			//如果客户端强制断开，这里将会报错
+			//e.printStackTrace();
 		}
-			
+		if(n==0){
+			return -1;
+		}
+		//TODO 这里有问题	
 		byte[] b=buffer.array();
 		byte[] h=new byte[b.length-8];	//减去头部的4个字节和尾部的4个字节
 		byte[] head_start=HeadBuffer.getHeadStart();
