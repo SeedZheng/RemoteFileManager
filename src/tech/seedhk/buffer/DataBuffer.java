@@ -71,7 +71,7 @@ public class DataBuffer implements Serializable{
 			try {
 				int s1=0;
 				int n=-1;
-				while(n!=0){
+				while(s1!=buff.limit()){//只要数据没发送完，就一直发送
 					n=channel.write(buff);
 					s1+=n;
 					log.info("本次发送的数据大小为："+n);
