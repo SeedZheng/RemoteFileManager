@@ -20,7 +20,7 @@ public class BodyProcess {
 	private static Logger log=Log.getInstance(BodyProcess.class);
 	
 	
-	public static void  processClient(BodyBuffer body,SocketChannel channel) throws IOException{
+	public static void  processClient(final BodyBuffer body,SocketChannel channel) throws IOException{
 		
 		if(body==null){
 			System.out.println("body is null");
@@ -68,7 +68,7 @@ public class BodyProcess {
 		log.info("processClient方法结束");
 	}
 	
-	public static void processServer(BodyBuffer body,SocketChannel channel) throws Exception{
+	public static void processServer(final BodyBuffer body,SocketChannel channel) throws Exception{
 		
 		if(body==null){
 			System.out.println("body is null");
@@ -91,7 +91,10 @@ public class BodyProcess {
 		
 		if("rpc".equals(cmd)){
 			ret_buf.setCmd("rpc");
-			ret_buf.setContent(new String(rpc(attach).array()));
+			if(!body.isHasAttach())
+				ret_buf.setContent(new String(rpc(attach).array()));
+			else
+				log.error("attach为空");
 		}
 		if("getFile".equals(cmd)){
 			
@@ -167,6 +170,7 @@ public class BodyProcess {
 			ProxyObject po=ProxyObject.newInstance();
 			po.getMethod("tech.seedhk.utils.FileUtils", "showDire", new Object[]{b.trim()}, String.class);
 			body_buff.setAttach(ProxyObject.bean2byte(po));
+			body_buff.setHasAttach(true);
 		}else if("getFile".equals(h)){
 			body_buff.setContent(b);
 		}else{
