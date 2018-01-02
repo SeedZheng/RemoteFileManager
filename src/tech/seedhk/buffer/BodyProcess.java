@@ -83,7 +83,7 @@ public class BodyProcess {
 			attach=body.getAttach();
 			attachName=body.getAttachName();
 		}
-		log.info("content 的文件类型是："+content.getClass().getName());
+		log.info("content 的文件类型是："+content.getClass());
 		
 		log.info("收到的命令为："+cmd);
 		
