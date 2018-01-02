@@ -80,10 +80,10 @@ public class BodyProcess {
 		ByteBuffer attach=null;
 		String attachName=null;
 		if(body.isHasAttach()){
-			attach=body.getAttach();
+			attach=body.getAttach();;
 			attachName=body.getAttachName();
 		}
-		log.info("content 的文件类型是："+content.getClass());
+		//log.info("content 的文件类型是："+content.getClass());
 		
 		log.info("收到的命令为："+cmd);
 		
