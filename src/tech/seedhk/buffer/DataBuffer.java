@@ -241,9 +241,10 @@ public class DataBuffer implements Serializable{
 		while(sum!=body_size){
 			try {
 				i=channel.read(body);
-				if(i!=0)
+				//if(i!=0)
 					log.info("本次拿到的body大小是:"+i);
-			} catch (IOException e) {
+				Thread.sleep(10);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			sum+=i;
