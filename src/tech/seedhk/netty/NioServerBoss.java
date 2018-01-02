@@ -15,10 +15,13 @@ import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
 import tech.seedhk.bean.ProxyObject;
 import tech.seedhk.buffer.BodyBuffer;
 import tech.seedhk.buffer.BodyProcess;
 import tech.seedhk.buffer.DataBuffer;
+import tech.seedhk.utils.Log;
 
 public class NioServerBoss implements Runnable{
 	
@@ -29,6 +32,7 @@ public class NioServerBoss implements Runnable{
 	
 	private Executor boss;
 	private Executor worker=Executors.newFixedThreadPool(2);
+	private static Logger log=Log.getInstance(NioServerBoss.class);
 	
 	private String threadName;
 	private static Selector selector;
@@ -64,7 +68,7 @@ public class NioServerBoss implements Runnable{
 			e.printStackTrace();
 		}
 		boss.execute(this);
-		System.out.println(Thread.currentThread().getName()+"启动成功");
+		log.info(Thread.currentThread().getName()+"启动成功");
 		
 	}
 
@@ -108,7 +112,7 @@ public class NioServerBoss implements Runnable{
 			this.selector = Selector.open();	//重新打开一个selector，让worker线程和boss线程各司其职
 			this.channel=c;
 			channel.register(selector, SelectionKey.OP_READ);
-			System.out.println(Thread.currentThread().getName()+"启动成功，等待client端连接");
+			log.info(Thread.currentThread().getName()+"启动成功，等待client端连接");
 		}
 
 		@Override
@@ -121,7 +125,7 @@ public class NioServerBoss implements Runnable{
 					if(n<1)
 						continue;//退出此次循环
 					
-					System.out.println(Thread.currentThread().getName()+"接收到一个client端请求");
+					log.info(Thread.currentThread().getName()+"接收到一个client端请求");
 					
 					Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
 					
@@ -142,7 +146,7 @@ public class NioServerBoss implements Runnable{
 						long body_size=data_buf.getHead(channel);
 						if(body_size<0){
 							key.cancel();
-							System.out.println("客户端断开连接");
+							log.info("客户端断开连接");
 							isStop=true;
 							break;	//该线程退出
 						}
@@ -158,7 +162,7 @@ public class NioServerBoss implements Runnable{
 						if (ret <= 0 || failure) {
 						if (ret <= 0) {
 							key.cancel();
-							System.out.println("客户端断开连接");
+							log.info("客户端断开连接");
 							isStop=true;
 							break;	//该线程退出
 				        }*/
@@ -174,13 +178,13 @@ public class NioServerBoss implements Runnable{
 				        	 * buffer2:数据内容
 				        	 */
 				        	/*String type=new String(getHead(head).array()).trim();
-				        	System.out.println(type);
+				        	log.info(type);
 				        	
 				        	ByteBuffer ret1 = null;
 				        	
 				        	if(type.equals("text")){
 				        		String retStr=new String(body.array()).trim();
-					        	 System.out.println("收到数据:" + retStr);
+					        	 log.info("收到数据:" + retStr);
 					        	 head.flip();
 					        	 body=ByteBuffer.wrap(("收到数据:" + retStr).getBytes());
 				        	}
@@ -217,7 +221,7 @@ public class NioServerBoss implements Runnable{
 				e.printStackTrace();
 			}
 			
-			System.out.println(Thread.currentThread().getName()+"，退出");
+			log.info(Thread.currentThread().getName()+"，退出");
 			
 		}
 		

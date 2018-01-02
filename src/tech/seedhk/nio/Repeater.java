@@ -12,16 +12,24 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
 import tech.seedhk.bean.ByteBuffer;
+import tech.seedhk.utils.Log;
 
 public class Repeater {
+	
+	static Logger log=Log.getInstance(Repeater.class);
 	
 	private static ExecutorService threadPool=Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	private Map<String, String> map=new HashMap<>();
 	
 	public static void main(String[] args) throws Exception {
+		int port=8888;
+		if(args.length>0)
+			port=Integer.parseInt(args[0]);
 		Repeater r=new Repeater();
-		r.initServer(8888);
+		r.initServer(port);
 	}
 	/*
 	 *break的作用是跳出当前循环块（for、while、do while）或程序块（switch）。在循环块中的作用是跳出当前正在循环的循环体。
@@ -33,12 +41,12 @@ public class Repeater {
 	@SuppressWarnings("resource")
 	private void initServer(int port)throws Exception{
 		ServerSocket ss=new ServerSocket(port);
-		System.out.println("repeater starting");
+		log.info("repeater starting");
 		while(true){
 			Socket s = ss.accept();
-			System.out.println("当前socket的hashcode："+s.hashCode());
+			log.info("当前socket的hashcode："+s.hashCode());
 			String ip=s.getInetAddress().getHostAddress();
-			System.out.println("ip："+ip);
+			log.info("ip："+ip);
 			if(map.get("server")!=null){
 				if(ip.equals(map.get("server"))){
 					threadPool.execute(new Sender(s));
@@ -91,7 +99,7 @@ public class Repeater {
 				is.close();
 				socket.close();
 				
-				System.out.println( type+"注册完毕");
+				log.info( type+"注册完毕");
 					
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -187,7 +195,7 @@ public class Repeater {
 				is.close();
 				//socket.close();
 				
-				System.out.println( type+"注册完毕");
+				log.info( type+"注册完毕");
 					
 			} catch (IOException e) {
 				e.printStackTrace();

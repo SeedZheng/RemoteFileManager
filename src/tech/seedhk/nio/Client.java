@@ -15,10 +15,13 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 import tech.seedhk.bean.ProxyObject;
 import tech.seedhk.buffer.BodyBuffer;
 import tech.seedhk.buffer.BodyProcess;
 import tech.seedhk.buffer.DataBuffer;
+import tech.seedhk.utils.Log;
 
 /**
  * 控制端，基于NIO,单线程足矣
@@ -29,10 +32,17 @@ public class Client {
 	
 	private  Selector selector;
 	private boolean isGet=false;
+	private static Logger log=Log.getInstance(Client.class);
 	
 	public static void main(String[] args) throws Exception {
+		String host="127.0.0.1";
+		int port=8888;
 		Client client=new Client();
-		client.register("127.0.0.1", 8888);
+		if(args.length>0){
+			host=args[0];
+			port=Integer.parseInt(args[1]);
+		}
+		client.register(host, port);
 	}
 	
 	public void register(String host,int port) throws Exception{
@@ -41,26 +51,26 @@ public class Client {
 		
 		while(!isGet){
 			 s=new Socket(host,port);
-			System.out.println("连接中继器成功");
+			 log.info("连接中继器成功");
 			InputStream is=new DataInputStream(s.getInputStream());
 			OutputStream os=new DataOutputStream(s.getOutputStream());
 
 			tech.seedhk.bean.ByteBuffer buffer=new tech.seedhk.bean.ByteBuffer();
 			buffer.write(os, "client");
-			System.out.println(is.available());
+			log.info(is.available());
 			byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
 			String ret=new String(data,"utf-8");
-			System.out.println(ret);
+			log.info(ret);
 			is.close();
 			os.close();
 			s.close();
 			if(ret.contains("getip")){
 				String ip=ret.substring(ret.indexOf(":")+1);
-				System.out.println("已获取到IP地址，地址是: "+ip);
+				log.info("已获取到IP地址，地址是: "+ip);
 				is.close();
 				os.close();
 				s.close();
-				System.out.println(s.isClosed());
+				log.info(s.isClosed());
 				initClient(ip,port);
 				isGet=true;
 			}	
@@ -78,7 +88,7 @@ public class Client {
 		
 		//执行完这步后，服务器端的select连接阻塞状态会解除,如果通道的阻塞模式为false，此方法会立即返回
 		boolean isDone=sc.connect(new InetSocketAddress(ip,port));
-		System.out.println(isDone);
+		log.info(isDone);
 		
 		sc.register(selector, SelectionKey.OP_CONNECT);
 		
@@ -140,15 +150,15 @@ public class Client {
 		long ret=-2;
 		while(ret!=-1 && ret!=0){
 			ret=sChannel.read(buffers);
-			System.out.println(ret);
+			log.info(ret);
 		}
 		getData(buffers);
 		
 		Scanner scan=new Scanner(System.in);
 		
-		System.out.println("请输入文件类型，text、rpc、getFile");
+		log.info("请输入文件类型，text、rpc、getFile");
 		String head=scan.nextLine().trim();
-		System.out.println("请输入路径：");
+		log.info("请输入路径：");
 		String body=scan.nextLine().trim();
 		ByteBuffer[] buffer=writeData(head, body);
 		sChannel.write(buffer);*/
@@ -193,11 +203,11 @@ public class Client {
 		int bodyPosition=b.position();
 		
 		String type=new String(h.array()).trim();
-		System.out.println("收到的数据类型为: "+type);
+		log.info("收到的数据类型为: "+type);
 		
 		if(type.equals("text") || type.equals("rpc")){
 			String msg=new String(b.array()).trim();
-			System.out.println("数据内容："+msg);
+			log.info("数据内容："+msg);
 		}
 		
 		if(type.contains("file")){
@@ -209,7 +219,7 @@ public class Client {
 			fos.write(data,0,bodyPosition);
 			fos.flush();
 			fos.close();
-			System.out.println("文件输出完毕");
+			log.info("文件输出完毕");
 		}
 	}
 	

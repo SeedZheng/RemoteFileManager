@@ -17,8 +17,11 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
+
 import tech.seedhk.bean.ProxyObject;
 import tech.seedhk.netty.NioServerBoss;
+import tech.seedhk.utils.Log;
 
 
 /**
@@ -29,21 +32,24 @@ import tech.seedhk.netty.NioServerBoss;
 public class Server {
 	
 	private Selector selector;
-	
+	private static Logger log=Log.getInstance(Server.class);
 	
 	public static void main(String[] args) throws Exception {
+		String host="127.0.0.1";
+		int port=8888;
 		//先连接中继器，注册成功后启动Server端
 		Server server=new Server();
-		//server.resister("127.0.0.1", 8888);
-		server.resister("192.168.147.1", 8888);
-		//server.initServer(6666);
-		//server.listen();
+		if(args.length>0){
+			host=args[0];
+			port=Integer.parseInt(args[1]);
+		}
+		server.resister(host, port);
 	}
 	
 	
 	private  void resister(String host,int port) throws Exception{
 		Socket s=new Socket(host, port);
-		System.out.println("连接中继器成功");
+		log.info("连接中继器成功");
 		InputStream is=new DataInputStream(s.getInputStream());
 		OutputStream os=new DataOutputStream(s.getOutputStream());
 
@@ -51,13 +57,13 @@ public class Server {
 		buffer.write(os, "server");
 		byte[] data = tech.seedhk.bean.ByteBuffer.read(is);
 		String ret=new String(data,"utf-8");
-		System.out.println(ret);
+		log.info(ret);
 		if("success".equals(ret)){
-			System.out.println("注册成功，启动sever");
+			log.info("注册成功，启动sever");
 			is.close();
 			os.close();
 			s.close();
-			System.out.println(s.isClosed());
+			log.info(s.isClosed());
 			new NioServerBoss(Executors.newCachedThreadPool(), "boss", selector, port);
 		}
 	}
@@ -84,7 +90,7 @@ public class Server {
 	}
 	
 	private void listen()throws Exception{
-		System.out.println("服务器启动成功，进入监听状态");
+		log.info("服务器启动成功，进入监听状态");
 		
 		while(true){
 			int n=selector.select();
@@ -126,7 +132,7 @@ public class Server {
 
 		@Override
 		public void run() {
-			System.out.println(Thread.currentThread().getName()+" 开始执行任务");
+			log.info(Thread.currentThread().getName()+" 开始执行任务");
 			if(key.isAcceptable()){
 				try {
 					ServerSocketChannel ssc=(ServerSocketChannel) key.channel();
@@ -162,7 +168,7 @@ public class Server {
 			//rpc(buffer);
 			
 			sc.write(buffer);
-			System.out.println("命令调用完成");
+			log.info("命令调用完成");
 		}
 
 		private ByteBuffer rpc(ByteBuffer buffer) {
