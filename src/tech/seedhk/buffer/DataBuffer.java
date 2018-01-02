@@ -69,7 +69,13 @@ public class DataBuffer implements Serializable{
 			//buff=bean2Buffer(buffer);
 			//buff.flip();//wrap得到的buffer无需flip
 			try {
-				int s1=channel.write(buff);
+				int s1=0;
+				int n=-1;
+				while(n!=0){
+					n=channel.write(buff);
+					s1+=n;
+					log.info("本次发送的数据大小为："+n);
+				}
 				//发送数据
 				s1+=channel.write(ByteBuffer.wrap(dataEnd));
 				log.info("发送数据大小： "+s1);
@@ -121,7 +127,11 @@ public class DataBuffer implements Serializable{
 			log.info("head 的大小是："+data.limit());
 			
 			try {
-				channel.write(data);
+				int n=-1;
+				while(n!=0){
+					n=channel.write(data);
+					log.info("本次发送的数据大小:"+n);
+				}
 				this.body.setReady(true);//准备发送body部分
 				//Thread.sleep(100);//睡眠100毫秒
 			} catch (IOException e) {
@@ -226,6 +236,7 @@ public class DataBuffer implements Serializable{
 		ByteBuffer body=ByteBuffer.allocate(body_size);
 		int i=-1;
 		long sum=0;
+		log.info("body_size："+body_size);
 		while(sum!=body_size){
 			try {
 				i=channel.read(body);
