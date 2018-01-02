@@ -44,7 +44,7 @@ public class BodyProcess {
 		
 		if(cmd.contains("file") && attach!=null && attachName !=null){
 			String basicPath=System.getProperty("user.dir");
-			File file=new File(basicPath+File.separator+"file"+attachName);
+			File file=new File(basicPath+File.separator+attachName);
 			FileOutputStream fos=new FileOutputStream(file);
 			fos.write(attach.array(),0,attach.limit());
 			fos.flush();
