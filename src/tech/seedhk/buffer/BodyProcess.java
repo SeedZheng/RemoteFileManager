@@ -80,7 +80,7 @@ public class BodyProcess {
 		ByteBuffer attach=null;
 		String attachName=null;
 		if(body.isHasAttach()){
-			attach=body.getAttach();;
+			attach=body.getAttach();
 			attachName=body.getAttachName();
 		}
 		//log.info("content 的文件类型是："+content.getClass());
@@ -91,7 +91,7 @@ public class BodyProcess {
 		
 		if("rpc".equals(cmd)){
 			ret_buf.setCmd("rpc");
-			if(!body.isHasAttach())
+			if(body.isHasAttach())
 				ret_buf.setContent(new String(rpc(attach).array()));
 			else
 				log.error("attach为空");
