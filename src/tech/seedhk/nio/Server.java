@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 import tech.seedhk.bean.ProxyObject;
-import tech.seedhk.netty.NioServerBoss;
 import tech.seedhk.utils.Log;
 
 
